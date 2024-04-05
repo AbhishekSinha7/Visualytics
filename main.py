@@ -22,9 +22,6 @@ st.sidebar.image("./assets/image.png")
 st.title(":sparkles: Visualytics")
 st.markdown('<style>div.block-container{padding-top:1rem;}</style>',unsafe_allow_html=True)
 
-def heu_heu(message):
-    st.write("Hello World")
-
 load_dotenv()
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
@@ -92,9 +89,9 @@ if menu == "Dashboard":
         st.write("")
         st.info("JSON View")
         st.write(summary)
+
 elif menu == "Analytics":
     if file_uploader is not None:
-          
         st.write("") 
         st.write("")
         summary = lida.summarize(df, summary_method="default", textgen_config=textgen_config)
@@ -175,7 +172,7 @@ elif menu == "Graph":
                     raise ValueError("The request is not properly specified or Not genuine: {}".format(str(e)))            
 elif menu == "Custom":
 
-    vst = st.selectbox("Select Visualization technique",["Bar","Pie","Pariplot","Heatmap","Linechart", "Treemap"])
+    vst = st.selectbox("Select Visualization technique",["Bar","Pie","Pairplot","Heatmap","Linechart", "Treemap"])
     
     if vst =="Bar":
         #bar chart 
@@ -219,7 +216,7 @@ elif menu == "Custom":
 
             st.download_button("Download Data", data=csv, file_name="Piechart.csv", mime="text/csv",
                             help='Click here to download the data as a CSV file')
-    elif vst=="Pariplot":
+    elif vst=="Pairplot":
         st.subheader('Pairplot')
 
         # Select a subset of the data
@@ -280,8 +277,11 @@ elif menu == "Custom":
             st.download_button('Download Data', data=csv, file_name="TimeSeries.csv", mime='text/csv')
 
     elif vst=="Treemap":
-        values = st.selectbox("Select values", df.select_dtypes(include='number').columns)
-        labels = st.selectbox("Select labels", df.columns.tolist())
+        xaxis_options = ['<select>'] + df.select_dtypes(include='number').columns.tolist()
+        yaxis_options = ['<select>'] + df.columns.tolist()
+
+        values = st.selectbox("Select x-axis column", xaxis_options)
+        labels = st.selectbox("Select y-axis column", yaxis_options)
         
         if values != '<select>' and labels != '<select>':
             selected_columns_df = df[[values, labels]]
