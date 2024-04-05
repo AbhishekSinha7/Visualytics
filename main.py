@@ -332,6 +332,8 @@ elif menu == "Custom":
 hide_st_style = """
             <style>
             footer {visibility: hidden;}
+            .stMenu-item:contains("View all apps") { display: none; }
+            .stMenu-item:contains("About") { display: none; }
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
