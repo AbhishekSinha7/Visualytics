@@ -17,7 +17,7 @@ from plotly import graph_objects as go
 warnings.filterwarnings('ignore')
 
 st.set_page_config(page_title="Visualytics", page_icon=":sparkles:",layout="wide")
-st.sidebar.image("./assets/image.png")
+st.sidebar.image("./assets/video.gif")
 
 st.title(":sparkles: Visualytics")
 st.markdown('<style>div.block-container{padding-top:1rem;}</style>',unsafe_allow_html=True)
@@ -26,10 +26,8 @@ load_dotenv()
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 def base64_to_image(base64_string):
-    # Decode the base64 string
     byte_data = base64.b64decode(base64_string)
     
-    # Use BytesIO to convert the byte data to image
     return Image.open(BytesIO(byte_data))
 
 library = "seaborn"
@@ -38,7 +36,6 @@ textgen_config = TextGenerationConfig(n=1, temperature=0.5, model="gpt-3.5-turbo
 menu = st.sidebar.selectbox("Menu", ["Dashboard","Analytics", "Code", "Graph","Custom"])
 file_uploader = st.file_uploader(":file_folder: Upload Your File", type=(["csv","xlsx","xls"]) )
 
-
 if file_uploader is not None:
     if file_uploader.type == "text/csv":
         df = pd.read_csv(file_uploader)
@@ -46,6 +43,8 @@ if file_uploader is not None:
         df = pd.read_excel(file_uploader)
     elif file_uploader.type == "text/tab-separated-values":
         df = pd.read_csv(file_uploader, sep='\t')
+    elif file_uploader.name.endswith('.xlsx'):  
+        df = pd.read_excel(file_uploader)
     summary = lida.summarize(df, summary_method="default", textgen_config=textgen_config)
             
 if menu == "Dashboard":
@@ -91,20 +90,22 @@ if menu == "Dashboard":
         st.write(summary)
 
 elif menu == "Analytics":
+    st.subheader("Analysis of the Data")
     if file_uploader is not None:
+          
         st.write("") 
         st.write("")
         summary = lida.summarize(df, summary_method="default", textgen_config=textgen_config)
 
         st.info("Analysis of the Dataset")
-        goals = lida.goals(summary, n=25, textgen_config=textgen_config)
-
+        goals = lida.goals(summary, n=5, textgen_config=textgen_config)
+        
+       
         def show_Analytics():
             count =0
             for goal in goals:
                 st.write("Q: ",goal.question)
                 st.write("Id: ",goal.visualization)
-                #st.write("Goal: ",goal.rationale)
                 textgen_config = TextGenerationConfig(n=1, temperature=0.2, use_cache=True)
                 charts = lida.visualize(summary=summary, goal=goal.visualization, textgen_config=textgen_config, library=library)  
                 
@@ -117,14 +118,49 @@ elif menu == "Analytics":
 
                 img_base64_string = charts[0].raster
                 img = base64_to_image(img_base64_string)
-                st.image(img)
+                st.image(img)   
+                
                 count=count+3
                 st.info("-------------------------------------------------------------------------------------------x-------------------------------------------------------------------------------------------")
                 if count % 3==0:
                     time.sleep(20)
-
+            
         while True:
-            show_Analytics()   
+            show_Analytics()
+    # if file_uploader is not None:
+    #     st.write("") 
+    #     st.write("")
+    #     summary = lida.summarize(df, summary_method="default", textgen_config=textgen_config)
+
+    #     st.info("Analysis of the Dataset")
+    #     goals = lida.goals(summary, n=25, textgen_config=textgen_config)
+
+    #     def show_Analytics():
+    #         count =0
+    #         for goal in goals:
+    #             st.write("Q: ",goal.question)
+    #             st.write("Id: ",goal.visualization)
+    #             #st.write("Goal: ",goal.rationale)
+    #             textgen_config = TextGenerationConfig(n=1, temperature=0.2, use_cache=True)
+    #             charts = lida.visualize(summary=summary, goal=goal.visualization, textgen_config=textgen_config, library=library)  
+                
+    #             # explanation = lida.explain(code=charts[0].code, library=library, textgen_config=textgen_config)
+    #             # chart_exp = None
+    #             # for section in explanation[0]:
+    #             #     if section["section"] == "accessibility":
+    #             #         chart_exp = section["explanation"]
+    #             # st.write("Explanation: ",chart_exp)
+
+    #             img_base64_string = charts[0].raster
+    #             img = base64_to_image(img_base64_string)
+    #             st.image(img)
+    #             count=count+3
+    #             st.info("-------------------------------------------------------------------------------------------x-------------------------------------------------------------------------------------------")
+    #             if count % 3==0:
+    #                 time.sleep(20)
+
+    #     while True:
+    #         show_Analytics()   
 
 elif menu == "Code":
     st.subheader("Query your Data to Generate Code")
@@ -163,7 +199,6 @@ elif menu == "Graph":
                 summary = lida.summarize(df, summary_method="default", textgen_config=textgen_config)
                 user_query = text_area
                 charts = lida.visualize(summary=summary, goal=user_query, textgen_config=textgen_config)  
-                #charts[0]
                 try:
                     image_base64 = charts[0].raster
                     img = base64_to_image(image_base64)
@@ -180,8 +215,8 @@ elif menu == "Custom":
         yaxis_options = ['<select>'] + df.select_dtypes(include=np.number).columns.tolist() 
 
         
-        xaxis = st.selectbox("Select x axis column", xaxis_options)
-        yaxis = st.selectbox("Select y axis column",yaxis_options)
+        xaxis = st.selectbox("Select x axis column (usually categorical)", xaxis_options)
+        yaxis = st.selectbox("Select y axis column (usually numerical)",yaxis_options)
 
         if xaxis != '<select>' and yaxis != '<select>':
             selected_columns_df = df[[xaxis, yaxis]]
@@ -201,8 +236,8 @@ elif menu == "Custom":
         values_options = ['<select>'] + df.select_dtypes(include=np.number).columns.tolist()
         labels_options = ['<select>'] + df.columns.tolist()
 
-        values = st.selectbox("Select values", values_options)
-        labels = st.selectbox("Select labels", labels_options)
+        values = st.selectbox("Select y axis column (usually numerical)", values_options)
+        labels = st.selectbox("Select x axis column (usually categorical)", labels_options)
 
         if values != '<select>' and labels != '<select>':
             selected_columns_df = df[[values, labels]]
@@ -216,28 +251,26 @@ elif menu == "Custom":
 
             st.download_button("Download Data", data=csv, file_name="Piechart.csv", mime="text/csv",
                             help='Click here to download the data as a CSV file')
+    
     elif vst=="Pairplot":
         st.subheader('Pairplot')
 
-        # Select a subset of the data
-        sample_data = df.sample(frac=0.5, random_state=42)  # Use 50% of the data
+        labels_options = ['<select>'] + df.columns.tolist()
+        hue_column = st.selectbox('Select a column to be used as hue', labels_options)
 
-        # Select a column to be used as hue
-        hue_column = st.selectbox('Select a column to be used as hue', sample_data.columns)
+        kind_options = ['scatter', 'reg', 'kde', 'hex']
+        kind = st.selectbox('Select the kind of plot', kind_options)
 
-        # Plot pair plots for combinations of columns
-        for col1 in sample_data.columns[:-1]:
-            for col2 in sample_data.columns[:-1]:
-                if col1 != col2:
-                    st.write("") 
-                    st.subheader(f"Pairplot for {col1} vs {col2}")
-                    st.pyplot(sns.pairplot(sample_data, hue=hue_column, x_vars=[col1], y_vars=[col2], palette="dark"))
-                    st.write("") 
+        if hue_column != '<select>':
+            for col1 in df.columns[:-1]:
+                for col2 in df.columns[:-1]:
+                    if col1 != col2:
+                        st.write("") 
+                        st.subheader(f"Pairplot for {col1} vs {col2}")
+                        st.pyplot(sns.pairplot(df, hue=hue_column, x_vars=[col1], y_vars=[col2], kind=kind, palette="dark",height=2,aspect=1.2))
+                        st.write("") 
                     
                     
-
-        #st.pyplot(sns.pairplot(sample_data, hue=hue_column))
-
     elif vst=="Heatmap":
         st.subheader('Heatmap')
 
@@ -262,8 +295,8 @@ elif menu == "Custom":
         xaxis_options = ['<select>'] + df.columns.tolist()
         yaxis_options = ['<select>'] + df.select_dtypes(include='number').columns.tolist()
 
-        xaxis = st.selectbox("Select x-axis column", xaxis_options)
-        yaxis = st.selectbox("Select y-axis column", yaxis_options)
+        xaxis = st.selectbox("Select x-axis column (usually categorical)", xaxis_options)
+        yaxis = st.selectbox("Select y-axis column (usually numerical)", yaxis_options)
 
         if xaxis != '<select>' and yaxis != '<select>':
             linechart = pd.DataFrame(df.groupby(df[xaxis])[yaxis].sum()).reset_index()
@@ -280,11 +313,11 @@ elif menu == "Custom":
         xaxis_options = ['<select>'] + df.select_dtypes(include='number').columns.tolist()
         yaxis_options = ['<select>'] + df.columns.tolist()
 
-        values = st.selectbox("Select x-axis column", xaxis_options)
-        labels = st.selectbox("Select y-axis column", yaxis_options)
+        labels = st.selectbox("Select x-axis column (usually numerical)", xaxis_options)
+        values = st.selectbox("Select y-axis column (usually categorical)", yaxis_options)
         
         if values != '<select>' and labels != '<select>':
-            selected_columns_df = df[[values, labels]]
+            selected_columns_df = df[[labels,values]]
 
             st.subheader("Treemap Chart")
             fig = px.treemap(df, path=[labels], values=values)
@@ -295,6 +328,7 @@ elif menu == "Custom":
             csv = selected_columns_df.to_csv(index=False).encode('utf-8')
             st.download_button("Download Data", data=csv, file_name="Treemap.csv", mime="text/csv",
                             help='Click here to download the data as a CSV file')
+            
 hide_st_style = """
             <style>
             footer {visibility: hidden;}
