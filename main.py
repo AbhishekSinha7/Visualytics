@@ -310,11 +310,11 @@ elif menu == "Custom":
             st.download_button('Download Data', data=csv, file_name="TimeSeries.csv", mime='text/csv')
 
     elif vst=="Treemap":
-        xaxis_options = ['<select>'] + df.select_dtypes(include='number').columns.tolist()
-        yaxis_options = ['<select>'] + df.columns.tolist()
+        xaxis_options = ['<select>'] + df.columns.tolist()
+        yaxis_options = ['<select>'] + df.select_dtypes(include='number').columns.tolist()
 
-        labels = st.selectbox("Select x-axis column (usually numerical)", xaxis_options)
-        values = st.selectbox("Select y-axis column (usually categorical)", yaxis_options)
+        labels = st.selectbox("Select x-axis column (usually categorical)", xaxis_options)
+        values = st.selectbox("Select y-axis column (usually numerical)", yaxis_options)
         
         if values != '<select>' and labels != '<select>':
             selected_columns_df = df[[labels,values]]
