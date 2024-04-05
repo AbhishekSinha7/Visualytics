@@ -332,9 +332,17 @@ elif menu == "Custom":
 hide_st_style = """
             <style>
             footer {visibility: hidden;}
-            .stApp_aboutButton { display: none; }
-            .stMenu-item:contains("View all apps") { display: none; }
-            .stMenu-item:contains("About") { display: none; }
             </style>
             """
+custom_css = """
+<style>
+div[data-testid="stStreamlitHeader"] div[role="menu"] > div:last-child {
+    display: none !important;
+}
+.st-AboutButton {
+    display: none !important;
+}
+</style>
+"""
 st.markdown(hide_st_style, unsafe_allow_html=True)
+st.markdown(custom_css, unsafe_allow_html=True)
