@@ -20,7 +20,7 @@ st.set_page_config(page_title="Visualytics", page_icon=":sparkles:",layout="wide
 st.sidebar.image("./assets/video.gif")
 
 st.title(":sparkles: Visualytics")
-st.markdown('<style>div.block-container{padding-top:1rem;}</style>',unsafe_allow_html=True)
+st.markdown('<style>div.block-container{padding-top:2rem;}</style>',unsafe_allow_html=True)
 
 load_dotenv()
 openai.api_key = os.getenv('OPENAI_API_KEY')
