@@ -123,44 +123,10 @@ elif menu == "Analytics":
                 count=count+3
                 st.info("-------------------------------------------------------------------------------------------x-------------------------------------------------------------------------------------------")
                 if count % 3==0:
-                    time.sleep(20)
+                    time.sleep(3)
             
         while True:
             show_Analytics()
-    # if file_uploader is not None:
-    #     st.write("") 
-    #     st.write("")
-    #     summary = lida.summarize(df, summary_method="default", textgen_config=textgen_config)
-
-    #     st.info("Analysis of the Dataset")
-    #     goals = lida.goals(summary, n=25, textgen_config=textgen_config)
-
-    #     def show_Analytics():
-    #         count =0
-    #         for goal in goals:
-    #             st.write("Q: ",goal.question)
-    #             st.write("Id: ",goal.visualization)
-    #             #st.write("Goal: ",goal.rationale)
-    #             textgen_config = TextGenerationConfig(n=1, temperature=0.2, use_cache=True)
-    #             charts = lida.visualize(summary=summary, goal=goal.visualization, textgen_config=textgen_config, library=library)  
-                
-    #             # explanation = lida.explain(code=charts[0].code, library=library, textgen_config=textgen_config)
-    #             # chart_exp = None
-    #             # for section in explanation[0]:
-    #             #     if section["section"] == "accessibility":
-    #             #         chart_exp = section["explanation"]
-    #             # st.write("Explanation: ",chart_exp)
-
-    #             img_base64_string = charts[0].raster
-    #             img = base64_to_image(img_base64_string)
-    #             st.image(img)
-    #             count=count+3
-    #             st.info("-------------------------------------------------------------------------------------------x-------------------------------------------------------------------------------------------")
-    #             if count % 3==0:
-    #                 time.sleep(20)
-
-    #     while True:
-    #         show_Analytics()   
 
 elif menu == "Code":
     st.subheader("Query your Data to Generate Code")
@@ -212,7 +178,7 @@ elif menu == "Custom":
     if vst =="Bar":
         #bar chart 
         xaxis_options = ['<select>'] + df.columns.tolist()
-        yaxis_options = ['<select>'] + df.select_dtypes(include=np.number).columns.tolist() 
+        yaxis_options = ['<select>'] + df.columns.tolist()
 
         
         xaxis = st.selectbox("Select x axis column (usually categorical)", xaxis_options)
@@ -233,7 +199,7 @@ elif menu == "Custom":
     
     elif vst=="Pie":
         
-        values_options = ['<select>'] + df.select_dtypes(include=np.number).columns.tolist()
+        values_options = ['<select>'] + df.columns.tolist()
         labels_options = ['<select>'] + df.columns.tolist()
 
         values = st.selectbox("Select y axis column (usually numerical)", values_options)
@@ -293,7 +259,7 @@ elif menu == "Custom":
     elif vst == "Linechart":
         # Line chart
         xaxis_options = ['<select>'] + df.columns.tolist()
-        yaxis_options = ['<select>'] + df.select_dtypes(include='number').columns.tolist()
+        yaxis_options = ['<select>'] + df.columns.tolist()
 
         xaxis = st.selectbox("Select x-axis column (usually categorical)", xaxis_options)
         yaxis = st.selectbox("Select y-axis column (usually numerical)", yaxis_options)
@@ -311,7 +277,7 @@ elif menu == "Custom":
 
     elif vst=="Treemap":
         xaxis_options = ['<select>'] + df.columns.tolist()
-        yaxis_options = ['<select>'] + df.select_dtypes(include='number').columns.tolist()
+        yaxis_options = ['<select>'] + df.columns.tolist()
 
         labels = st.selectbox("Select x-axis column (usually categorical)", xaxis_options)
         values = st.selectbox("Select y-axis column (usually numerical)", yaxis_options)
