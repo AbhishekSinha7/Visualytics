@@ -32,7 +32,7 @@ def base64_to_image(base64_string):
 
 library = "seaborn"
 lida = Manager(text_gen = llm("openai"))
-textgen_config = TextGenerationConfig(n=1, temperature=0.5, model="gpt-3.5-turbo-0301", use_cache=True)
+textgen_config = TextGenerationConfig(n=1, temperature=0.5, model="gpt-3.5-turbo-0125", use_cache=True)
 menu = st.sidebar.selectbox("Menu", ["Dashboard","Analytics", "Code", "Graph","Custom"])
 file_uploader = st.file_uploader(":file_folder: Upload Your File", type=(["csv","xlsx","xls"]) )
 
