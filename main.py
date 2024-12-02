@@ -37,7 +37,7 @@ menu = st.sidebar.selectbox("Menu", ["Dashboard","Analytics", "Code", "Graph","C
 file_uploader = st.file_uploader(":file_folder: Upload Your File", type=(["csv","xlsx","xls"]) )
 
 if file_uploader is not None:
-    #st.write("file_uploader.type",file_uploader.type) 
+    st.write("file_uploader.type",file_uploader.type) 
     if file_uploader.type == "application/vnd.ms-excel":
         df = pd.read_csv(file_uploader)
     elif file_uploader.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
